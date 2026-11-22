@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: deploy-to-friends
+expected_outcome: |
+  デプロイ・複数人利用の前提で、認証なしだと URL を知る誰もが所有者のキーを使える点を高として挙げ、認証や利用者キー入力などの具体策、コスト・レート制限、GitHub への秘密情報混入防止、Gemini へのデータ送信について触れ、ファイルは変更しない。
+context:
+  scaffold_script: place-files.sh

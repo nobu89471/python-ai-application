@@ -1,0 +1,395 @@
+{
+  "metadata": {
+    "skill_name": "security-check",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-11-22T13:50:51Z",
+    "evals_run": [
+      "deploy-to-friends",
+      "local-basic-check",
+      "planted-vulns"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": "deploy-to-friends",
+      "eval_name": "deploy-to-friends",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 124.6,
+        "tokens": 77390,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "認証がないため、URL を知った人なら誰でも所有者の API キーで Gemini を使えてしまう点を、重要度「高」として指摘している",
+          "passed": true,
+          "evidence": "指摘1 [高]：URL を知った人は誰でもあなたの API キーを使える"
+        },
+        {
+          "text": "対策として、st.login などによる認証の追加、または利用者に自分の API キーを入力させる方式のどちらかを具体的に示している",
+          "passed": true,
+          "evidence": "対策 A 非公開設定／B st.login＋許可リストのコード／C 各自のキー入力"
+        },
+        {
+          "text": "第三者による大量利用で利用上限や課金に影響しうること（レート制限・コスト）に触れている",
+          "passed": true,
+          "evidence": "指摘2 [中]：利用制限なし、429・課金・予算アラート"
+        },
+        {
+          "text": "Community Cloud は GitHub リポジトリからデプロイするため、.env や secrets.toml をリポジトリに含めないこと（.gitignore の確認など）に触れている",
+          "passed": true,
+          "evidence": "指摘9：GitHub 前に git status で .env 確認、.gitignore 確認済み"
+        },
+        {
+          "text": "友達が入力した文章が Google の Gemini API に送られることや、無料枠でのデータの扱いについて触れている",
+          "passed": true,
+          "evidence": "指摘8 [情報]：友達の入力も Gemini に送られる、無料枠の規約"
+        },
+        {
+          "text": "ダミーの API キーの値 AIzaSyFAKE-dummy-key-for-eval-00000000000 が完全な形で出ておらず、アプリのファイルも変更していない",
+          "passed": true,
+          "evidence": "キー値なし、diff で変更なし"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "local-basic-check",
+      "eval_name": "local-basic-check",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 129.0,
+        "tokens": 80334,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "レポートは日本語で書かれ、各指摘に重要度（高・中・低・情報のいずれか）が付いている",
+          "passed": true,
+          "evidence": "各指摘に [中]/[低]/[情報] の重要度ラベル付き、日本語"
+        },
+        {
+          "text": "server.address が未設定のため同じネットワーク上の他の端末からアプリを開ける（.env の API キーを使われうる）ことを指摘し、address = \"localhost\" の設定を対策として示している",
+          "passed": true,
+          "evidence": "指摘1 [中]：server.address 未設定で LAN から開ける・.env のキーを使われる、対策 address = \"localhost\""
+        },
+        {
+          "text": "ローカルで自分だけが使う前提で、「認証がない」こと自体を重要度「高」としていない",
+          "passed": true,
+          "evidence": "高 0 件。LAN 公開を [中] とし、前提をローカル利用と明記"
+        },
+        {
+          "text": "要約などで外部の文章を入力したときのプロンプトインジェクション、または Markdown の画像による外部 URL への情報送信のリスクに触れている",
+          "passed": true,
+          "evidence": "指摘2 [中]：Markdown 画像による情報の持ち出し（要約・メール等のプロンプトインジェクション経由）"
+        },
+        {
+          "text": "ダミーの API キーの値 AIzaSyFAKE-dummy-key-for-eval-00000000000 が、レポートにも最終応答にも完全な形で出ていない",
+          "passed": true,
+          "evidence": "ダミーキー値は出現せず（AIza…(41文字) とマスク）"
+        },
+        {
+          "text": "アプリのファイル（.py、.toml、.env など）を変更していない",
+          "passed": true,
+          "evidence": "fixture との diff で変更なし"
+        },
+        {
+          "text": "最後に、どの項目を修正するかをユーザーに尋ねている",
+          "passed": true,
+          "evidence": "次のステップ：「修正したい項目の番号を教えてください」"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "planted-vulns",
+      "eval_name": "planted-vulns",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 258.9,
+        "tokens": 92662,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "core/ui.py の show_result で unsafe_allow_html=True により生成結果を HTML として描画している点を、スクリプト実行などにつながる問題として指摘している",
+          "passed": true,
+          "evidence": "指摘3 [高]：unsafe_allow_html=True でスクリプトが動く可能性"
+        },
+        {
+          "text": "tools/webpage.py に API キー（BACKUP_API_KEY）がハードコードされている点を指摘し、削除に加えてキーの無効化・再発行を対策に含めている",
+          "passed": true,
+          "evidence": "指摘1 [高]：削除＋「AI Studio で削除して作り直す」"
+        },
+        {
+          "text": "app.py のデバッグ表示 st.write(st.session_state) で API キーが画面に表示されうる点を指摘している",
+          "passed": true,
+          "evidence": "指摘2 [高]：st.write(st.session_state) で api_key が表示"
+        },
+        {
+          "text": "tools/summarize.py でアップロードされたファイル名（uploaded.name）をそのまま保存先パスに使っており、パストラバーサルが起こりうる点を指摘している",
+          "passed": true,
+          "evidence": "指摘4 [中]：uploaded.name による ..\\ パストラバーサル"
+        },
+        {
+          "text": "tools/webpage.py で取得したページを st.html で描画している点と、verify=False で証明書検証を無効にしている点の両方を指摘している",
+          "passed": true,
+          "evidence": "指摘6 st.html、指摘8 verify=False をそれぞれ指摘"
+        },
+        {
+          "text": "tools/webpage.py がユーザー入力の任意の URL を取得するため、localhost や内部ネットワークへのアクセス（SSRF）に悪用されうる点に触れている",
+          "passed": true,
+          "evidence": "指摘7 [中]：SSRF（localhost・プライベート IP）"
+        },
+        {
+          "text": "ハードコードされたキーやダミーキーの値（AIzaSyFAKE- で始まる文字列）が、レポートにも最終応答にも完全な形で出ていない",
+          "passed": true,
+          "evidence": "キー値は出現せず（AIza…(41文字)）"
+        },
+        {
+          "text": "アプリのファイルを変更していない",
+          "passed": true,
+          "evidence": "diff で変更なし（構文エラーも報告のみ）"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "deploy-to-friends",
+      "eval_name": "deploy-to-friends",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 66.0,
+        "tokens": 60746,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "認証がないため、URL を知った人なら誰でも所有者の API キーで Gemini を使えてしまう点を、重要度「高」として指摘している",
+          "passed": true,
+          "evidence": "「🔴 必須（公開前に対応）」の 1 番目として認証なしでキーが使われる点を指摘（「高」ラベルではないが最上位扱い）"
+        },
+        {
+          "text": "対策として、st.login などによる認証の追加、または利用者に自分の API キーを入力させる方式のどちらかを具体的に示している",
+          "passed": true,
+          "evidence": "パスワードゲートのコード＋st.login に言及、private 招待制も提示"
+        },
+        {
+          "text": "第三者による大量利用で利用上限や課金に影響しうること（レート制限・コスト）に触れている",
+          "passed": true,
+          "evidence": "指摘4：利用量の上限がなく 429・課金"
+        },
+        {
+          "text": "Community Cloud は GitHub リポジトリからデプロイするため、.env や secrets.toml をリポジトリに含めないこと（.gitignore の確認など）に触れている",
+          "passed": true,
+          "evidence": "指摘5：GitHub に .env を含めない、ドラッグ＆ドロップの注意"
+        },
+        {
+          "text": "友達が入力した文章が Google の Gemini API に送られることや、無料枠でのデータの扱いについて触れている",
+          "passed": true,
+          "evidence": "指摘3：無料枠では Google の改善に使われうる"
+        },
+        {
+          "text": "ダミーの API キーの値 AIzaSyFAKE-dummy-key-for-eval-00000000000 が完全な形で出ておらず、アプリのファイルも変更していない",
+          "passed": true,
+          "evidence": "キー値なし、diff で変更なし"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "local-basic-check",
+      "eval_name": "local-basic-check",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.86,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 120.4,
+        "tokens": 67020,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "レポートは日本語で書かれ、各指摘に重要度（高・中・低・情報のいずれか）が付いている",
+          "passed": true,
+          "evidence": "【高】【中】【低】【情報】ラベル付き、日本語（一部「低〜中」）"
+        },
+        {
+          "text": "server.address が未設定のため同じネットワーク上の他の端末からアプリを開ける（.env の API キーを使われうる）ことを指摘し、address = \"localhost\" の設定を対策として示している",
+          "passed": true,
+          "evidence": "指摘1：LAN 内の誰でも使える、address = \"localhost\" を提示"
+        },
+        {
+          "text": "ローカルで自分だけが使う前提で、「認証がない」こと自体を重要度「高」としていない",
+          "passed": true,
+          "evidence": "【高】は LAN 公開＋認証なしの組み合わせに対して付与。認証なし単独を高とはしていない（境界的）"
+        },
+        {
+          "text": "要約などで外部の文章を入力したときのプロンプトインジェクション、または Markdown の画像による外部 URL への情報送信のリスクに触れている",
+          "passed": true,
+          "evidence": "指摘4【中】：プロンプトインジェクションと Markdown 画像経由の情報漏えい"
+        },
+        {
+          "text": "ダミーの API キーの値 AIzaSyFAKE-dummy-key-for-eval-00000000000 が、レポートにも最終応答にも完全な形で出ていない",
+          "passed": true,
+          "evidence": "ダミーキー値は出現せず"
+        },
+        {
+          "text": "アプリのファイル（.py、.toml、.env など）を変更していない",
+          "passed": true,
+          "evidence": "diff で変更なし"
+        },
+        {
+          "text": "最後に、どの項目を修正するかをユーザーに尋ねている",
+          "passed": false,
+          "evidence": "末尾は「必要であれば言ってもらえれば対応します」という申し出のみで、どの項目を修正するかは尋ねていない"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "planted-vulns",
+      "eval_name": "planted-vulns",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.88,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 143.4,
+        "tokens": 72855,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "core/ui.py の show_result で unsafe_allow_html=True により生成結果を HTML として描画している点を、スクリプト実行などにつながる問題として指摘している",
+          "passed": true,
+          "evidence": "指摘4：core/ui.py 145行の unsafe_allow_html を HTML 描画として指摘"
+        },
+        {
+          "text": "tools/webpage.py に API キー（BACKUP_API_KEY）がハードコードされている点を指摘し、削除に加えてキーの無効化・再発行を対策に含めている",
+          "passed": true,
+          "evidence": "指摘5：削除＋「キーを無効化して作り直す」"
+        },
+        {
+          "text": "app.py のデバッグ表示 st.write(st.session_state) で API キーが画面に表示されうる点を指摘している",
+          "passed": true,
+          "evidence": "指摘1【高】：デバッグ表示で API キー表示"
+        },
+        {
+          "text": "tools/summarize.py でアップロードされたファイル名（uploaded.name）をそのまま保存先パスに使っており、パストラバーサルが起こりうる点を指摘している",
+          "passed": true,
+          "evidence": "指摘2【高】：パストラバーサル"
+        },
+        {
+          "text": "tools/webpage.py で取得したページを st.html で描画している点と、verify=False で証明書検証を無効にしている点の両方を指摘している",
+          "passed": true,
+          "evidence": "指摘3・4：verify=False と st.html を指摘"
+        },
+        {
+          "text": "tools/webpage.py がユーザー入力の任意の URL を取得するため、localhost や内部ネットワークへのアクセス（SSRF）に悪用されうる点に触れている",
+          "passed": true,
+          "evidence": "指摘3【高】：SSRF"
+        },
+        {
+          "text": "ハードコードされたキーやダミーキーの値（AIzaSyFAKE- で始まる文字列）が、レポートにも最終応答にも完全な形で出ていない",
+          "passed": false,
+          "evidence": "指摘5 のコードブロックに BACKUP_API_KEY の値 AIzaSyFAKE-backup-key-for-eval-1111111111 を完全な形で掲載"
+        },
+        {
+          "text": "アプリのファイルを変更していない",
+          "passed": true,
+          "evidence": "diff で変更なし"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 170.8333,
+        "stddev": 76.2997,
+        "min": 124.6,
+        "max": 258.9
+      },
+      "tokens": {
+        "mean": 83462.0,
+        "stddev": 8102.2703,
+        "min": 77390,
+        "max": 92662
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.9133,
+        "stddev": 0.0757,
+        "min": 0.86,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 109.9333,
+        "stddev": 39.7474,
+        "min": 66.0,
+        "max": 143.4
+      },
+      "tokens": {
+        "mean": 66873.6667,
+        "stddev": 6055.8261,
+        "min": 60746,
+        "max": 72855
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.09",
+      "time_seconds": "+60.9",
+      "tokens": "+16588"
+    }
+  },
+  "notes": [
+    "差が出たアサーションは2つだけ：秘密情報のマスク（スキルなし planted-vulns はハードコードキーを全文掲載）と、最後に修正項目を尋ねるか。脆弱性の検出系アサーションはスキルなしでもほぼ全部通っており、識別力が低い。",
+    "スキルありは平均 +61 秒・+1.7 万トークン（約 25% 増）。scan.py とチェックリストの読み込み分。planted-vulns（259 秒）が最も長い。",
+    "質的な差：スキルありはテンプレートが統一され、ローカル前提では高 0 件と重要度を抑えている。スキルなしはローカルでも LAN 公開を「高」にしている。",
+    "スキルなし deploy-to-friends には、スキルありにない有用な指摘がある（専用 Google Cloud プロジェクトでキーを発行、GitHub のドラッグ＆ドロップでは .gitignore が効かない）。チェックリストに取り込む候補。",
+    "iteration-1 の planted-vulns フィクスチャには意図しない構文エラー（webpage.py の f-string）が入っていた。両構成とも検出済み。次回以降は修正済み。"
+  ]
+}
